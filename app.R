@@ -10,6 +10,8 @@ library(dplyr)
 # kun hvis næste liste hvis buttom trykkes
 # ændre navne
 
+# tester om git virker
+
 if (!exists('medlemmer')) {
   medlemmer <- c('Alexander',
                  'And',
