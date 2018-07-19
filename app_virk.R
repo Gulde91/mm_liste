@@ -14,10 +14,12 @@ library(dplyr)
 
 if (!exists('medlemmer')) {
   medlemmer <- c('Alexander',
-                 'And',
-                 'Annds',
-                 'As',
-                 'Tina'
+                 'Erik',
+                 'Jenny',
+                 'Rasmus',
+                 'Hege',
+                 'Rasmus',
+                 'Kristian'
   )
 }
 
