@@ -40,7 +40,7 @@ if(!exists('morgen2')) {
   morgen2$Dato <- seq(startdato, startdato+(nrow(morgen2)-1), by = 'day')
 }
 
-test <- Sys.Date()
+akt_dato <- Sys.Date()
 
 ui <- dashboardPage(skin = 'blue',
                     dashboardHeader(
@@ -84,7 +84,7 @@ server <- shinyServer(function(input, output, session) {
   
   # testdato
   observeEvent(input$dato, {
-    test <<- as.Date(test) + 1
+    akt_dato <<- as.Date(akt_dato) + 1
   })
   
   ### TILMELD/AFMELD -----------------------------------------------
@@ -176,7 +176,7 @@ server <- shinyServer(function(input, output, session) {
         
         if(input$afmeld_nu == T) {
           if (input$afmeld_pers %in% morgen$Person) {
-            afm_akt_index <<- which(morgen$Dato == as.Date(test)) # sys.Date() kode til rettes til uge-basis
+            afm_akt_index <<- which(morgen$Dato == as.Date(akt_dato)) # sys.Date() kode til rettes til uge-basis
             
             if (sum(morgen$Person == input$afmeld_pers) == 1) {
               if (morgen$Person[afm_akt_index] == input$afmeld_pers) {
@@ -245,7 +245,7 @@ server <- shinyServer(function(input, output, session) {
       } 
       else if (input$afmeld_midl == T) {
         if (input$afmeld_pers %in% morgen$Person) {
-          afmeld_midl_index <- which(morgen$Dato == as.Date(test)) # sys.Date() kode til rettes til uge-basis
+          afmeld_midl_index <- which(morgen$Dato == as.Date(akt_dato)) # sys.Date() kode til rettes til uge-basis
           
           if (morgen$Person[afmeld_midl_index] == input$afmeld_pers) {
             showModal(til_afm_model(failed = TRUE))
@@ -302,7 +302,7 @@ server <- shinyServer(function(input, output, session) {
         
         if(input$tilmeld_nu == T) {
           if(!(input$Tilmeld_pers %in% morgen$Person)) {
-            #which(morgen$Dato %in% seq(dags_dato-7, as.Date(test), by = 'day'))
+            #which(morgen$Dato %in% seq(dags_dato-7, as.Date(akt_dato), by = 'day'))
             
             dato_input <- format(morgen$Dato[nrow(morgen)] + 1, format = '%Y-%m-%d') # + 6
             
@@ -553,12 +553,12 @@ server <- shinyServer(function(input, output, session) {
         
         skip_slet <- which(morgen$Dato == input$dato_skip)
         
-        if (which(morgen$Dato == as.Date(test)) %in% skip_slet) { # %in% seq(Sys.Date()-7, Sys.Date(), by = 'day')
+        if (which(morgen$Dato == as.Date(akt_dato)) %in% skip_slet) { # %in% seq(Sys.Date()-7, Sys.Date(), by = 'day')
           showModal(skip_Modal(failed = TRUE))
         }
         else {
           
-          if (which(morgen$Dato == input$dato_skip) > which(morgen$Dato == as.Date(test))) {
+          if (which(morgen$Dato == input$dato_skip) > which(morgen$Dato == as.Date(akt_dato))) {
             morgen2$Dato <<- morgen2$Dato - 1  
           }
           
@@ -603,8 +603,8 @@ server <- shinyServer(function(input, output, session) {
     input$ok_byt
     input$ok_til_afm
     
-    #index <- which(morgen$Dato %in% seq(dags_dato-7, as.Date(test), by = 'day'))
-    index <<- which(morgen$Dato == as.Date(test))
+    #index <- which(morgen$Dato %in% seq(dags_dato-7, as.Date(akt_dato), by = 'day'))
+    index <<- which(morgen$Dato == as.Date(akt_dato))
     
     if(length(index) == 0) {
       
@@ -614,8 +614,8 @@ server <- shinyServer(function(input, output, session) {
       # morgen2 bliver nu morgen
       morgen <<- morgen2 
       
-      #index <- which(morgen$Dato %in% seq(dags_dato-7, as.Date(test), by = 'day'))
-      index <- which(morgen$Dato == as.Date(test))
+      #index <- which(morgen$Dato %in% seq(dags_dato-7, as.Date(akt_dato), by = 'day'))
+      index <- which(morgen$Dato == as.Date(akt_dato))
       
       # konstruerer næste liste, morgen2
       startdato <- morgen$Dato[nrow(morgen)] + 1 # + 6
