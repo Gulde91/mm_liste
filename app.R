@@ -15,7 +15,7 @@ library(dplyr)
 if (!exists('medlemmer')) {
   medlemmer <- c('Alexander',
                  'And',
-                 'Ann',
+                 'Annds',
                  'As',
                  'Tina'
   )
@@ -27,7 +27,7 @@ morgen_orig$Person <- as.character(morgen_orig$Person)
 if (!exists('morgen')) {
   morgen <- data.frame(Person = medlemmer)
   morgen$Person <- as.character(morgen$Person)
-  startdato <- as.Date("2017-10-05")
+  startdato <- as.Date("2018-07-19")
   #  morgen$Dato <- seq(startdato, startdato+((nrow(morgen)-1)*7), by = 'week')
   morgen$Dato <- seq(startdato, startdato+(nrow(morgen)-1), by = 'day')
 }
@@ -40,7 +40,7 @@ if(!exists('morgen2')) {
   morgen2$Dato <- seq(startdato, startdato+(nrow(morgen2)-1), by = 'day')
 }
 
-test <- '2017-10-08'
+test <- Sys.Date()
 
 ui <- dashboardPage(skin = 'blue',
                     dashboardHeader(
@@ -48,18 +48,18 @@ ui <- dashboardPage(skin = 'blue',
                     ),
                     dashboardSidebar(
                       sidebarMenu(
-                        menuItem('Morgenmadsliste', tabName = 'morgen', icon = icon('birthday-cake')) # birthday-cake
+                        menuItem('Morgenmadsliste', tabName = 'morgen', icon = icon('coffe')) # birthday-cake
                       )
                       
                     ),
                     dashboardBody(
                       tabItems(
                         tabItem(tabName = 'morgen',
-                                h2('Morgenmadsliste'),
+                                h2('Morgenmad'),
                                 hr(),
                                 fluidRow(
                                   column(7,
-                                         box(title = 'Morgenmad', solidHeader = T, status = 'primary',
+                                         box(title = 'Morgenmadsliste', solidHeader = T, status = 'primary',
                                              DT::dataTableOutput('morgen'),
                                              width = 400
                                          ),
@@ -630,7 +630,7 @@ server <- shinyServer(function(input, output, session) {
     
     morgen_output <<- rbind(morgen, morgen2)
     
-    DT::datatable(morgen_output[(index-1):(index+7),], 
+    DT::datatable(morgen_output[(index-1):(index+5),], 
                   options = list(paging = F, 
                                  searching = F, 
                                  bInfo = F), 
