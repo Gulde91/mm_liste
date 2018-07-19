@@ -10,14 +10,13 @@ rm(list=ls())
 # kun hvis næste liste hvis buttom trykkes
 # ændre navne
 
-# tester om git virker
+dato_interval <- 7
 
 if (!exists('medlemmer')) {
   medlemmer <- c('Alexander',
                  'Erik',
                  'Jenny',
-                 'Rasmus',
-                 'Hege',
+                 #'Hege',
                  'Rasmus',
                  'Kristian'
   )
@@ -29,17 +28,15 @@ morgen_orig$Person <- as.character(morgen_orig$Person)
 if (!exists('morgen')) {
   morgen <- data.frame(Person = medlemmer)
   morgen$Person <- as.character(morgen$Person)
-  startdato <- as.Date("2018-07-19")
-  #  morgen$Dato <- seq(startdato, startdato+((nrow(morgen)-1)*7), by = 'week')
-  morgen$Dato <- seq(startdato, startdato+(nrow(morgen)-1), by = 'day')
+  startdato <- as.Date("2018-07-18")
+  morgen$Dato <- seq(startdato, startdato + (nrow(morgen) - 1) * dato_interval, by = dato_interval)
 }
 
 if(!exists('morgen2')) {
   morgen2 <- data.frame(Person = medlemmer)
   morgen2$Person <- as.character(morgen2$Person)
-  startdato <- morgen$Dato[nrow(morgen)] + 1 # + 6
-  #  morgen2$Dato <<- seq(startdato, startdato+((nrow(morgen2)-1)*7), by = 'week')
-  morgen2$Dato <- seq(startdato, startdato+(nrow(morgen2)-1), by = 'day')
+  startdato <- morgen$Dato[nrow(morgen)] + dato_interval
+  morgen2$Dato <- seq(startdato, startdato + (nrow(morgen2) - 1) * dato_interval, by = dato_interval)
 }
 
 akt_dato <- Sys.Date()
@@ -90,8 +87,8 @@ server <- shinyServer(function(input, output, session) {
     input$ok_byt
     input$ok_til_afm
     
-    #index <- which(morgen$Dato %in% seq(dags_dato-7, as.Date(akt_dato), by = 'day'))
-    index <<- which(morgen$Dato == as.Date(akt_dato))
+    index <- which(morgen$Dato %in% seq(akt_dato, akt_dato + dato_interval - 1, by = 'day'))
+    #index <<- which(morgen$Dato == as.Date(akt_dato))
     
     if(length(index) == 0) {
       
@@ -101,14 +98,12 @@ server <- shinyServer(function(input, output, session) {
       # morgen2 bliver nu morgen
       morgen <<- morgen2 
       
-      #index <- which(morgen$Dato %in% seq(dags_dato-7, as.Date(akt_dato), by = 'day'))
-      index <- which(morgen$Dato == as.Date(akt_dato))
+      index <- which(morgen$Dato %in% seq(akt_dato, akt_dato + dato_interval - 1, by = dato_interval))
       
       # konstruerer næste liste, morgen2
-      startdato <- morgen$Dato[nrow(morgen)] + 1 # + 6
+      startdato2 <- morgen$Dato[nrow(morgen)] + dato_interval
       morgen2 <<- morgen_orig 
-      #morgen$Dato <<- seq(startdato, startdato+((nrow(morgen)-1)*7), by = 'week')
-      morgen2$Dato <<- seq(startdato, startdato+(nrow(morgen2)-1), by = 'day')
+      morgen2$Dato <<- seq(startdato2, startdato2 + (nrow(morgen2) - 1) * dato_interval, by = dato_interval)
       
     }
     
