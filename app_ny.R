@@ -400,6 +400,163 @@ server <- shinyServer(function(input, output, session) {
   })
   
   
+  
+  ### SKIP --------------------------------------
+  
+  skip_Modal <- function(failed = FALSE) {
+    modalDialog(easyClose = T,
+                fade = T,
+                title = 'SKIP',
+                
+                selectInput(inputId = 'skip_slet',
+                            label = 'Vælg handling',
+                            choices = list('Skip',
+                                           'Slet',
+                                           'Tilføj')),
+                
+                dateInput(inputId = 'dato_skip', 
+                          label = 'Vælg dato'),
+                
+                conditionalPanel(
+                  condition = "input.skip_slet == 'Tilføj'",
+                  selectInput(inputId = "tilføj_pers", 
+                              label = 'Tilføj',
+                              choices =  medlemmer)
+                ),
+                
+                if (failed) { 
+                  if(input$skip_slet == 'Tilføj') {
+                    div(tags$b("Hov, der findes allerede en på denne dato", style = "color: blue;"))
+                  }
+                  else {
+                    div(tags$b("Hov, er der valgt en korrekt dato?", style = "color: blue;"))
+                  }
+                  
+                },
+                
+                footer = tagList(
+                  modalButton("Cancel"),
+                  actionButton("ok_skip", "OK")
+                )
+                
+    )}
+  
+  # Show til_afm_model when button is clicked.
+  observeEvent(input$skip, {
+    showModal(skip_Modal())
+  })
+  
+  # when the skip button is clicked, skip to next week  
+  observeEvent(input$ok_skip, {
+
+    if (input$skip_slet == 'Skip') {
+
+      if (input$dato_skip %in% morgen$Dato) {
+
+        skip_index <- which(morgen$Dato == input$dato_skip)
+
+        if(skip_index == 1) {
+
+          morgen <<- rbind(data.frame(Person = 'Ingen morgenmad',
+                                      Dato = morgen$Dato[skip_index]),
+                           morgen[skip_index:nrow(morgen),])
+
+        }
+
+        if (skip_index > 1) {
+
+          morgen <<- rbind(morgen[1:(skip_index-1),],
+                           data.frame(Person = 'Ingen morgenmad',
+                                      Dato = morgen$Dato[skip_index]),
+                           morgen[skip_index:nrow(morgen),])
+        }
+
+        morgen$Dato[(skip_index+1):nrow(morgen)] <<- morgen$Dato[(skip_index+1):nrow(morgen)] + dato_interval
+
+        morgen2$Dato <<- morgen2$Dato + dato_interval
+
+        removeModal()
+      }
+      else if (input$dato_skip %in% morgen2$Dato) {
+
+        skip_index2 <- which(morgen2$Dato == input$dato_skip)
+
+        if (skip_index2 == 1) {
+
+          morgen2 <<- rbind(data.frame(Person = 'Ingen morgenmad',
+                                       Dato = morgen2$Dato[skip_index2]),
+                            morgen2[skip_index2:nrow(morgen2),])
+
+        }
+
+        if(skip_index2 > 1) {
+
+          morgen2 <<- rbind(morgen2[1:(skip_index2-1),],
+                            data.frame(Person = 'Ingen morgenmad',
+                                       Dato = morgen2$Dato[skip_index2]),
+                            morgen2[skip_index2:nrow(morgen2),])
+        }
+
+        morgen2$Dato[(skip_index2+1):nrow(morgen2)] <<- morgen2$Dato[(skip_index2+1):nrow(morgen2)] + 1
+
+        removeModal()
+      }
+      else{
+        showModal(skip_Modal(failed = TRUE))
+      }
+    }
+
+    if (input$skip_slet == 'Slet') {
+
+      if (input$dato_skip %in% morgen$Dato) {
+
+        skip_slet <- which(morgen$Dato == input$dato_skip)
+
+        if (which(morgen$Dato == akt_dato) %in% skip_slet) { # %in% seq(Sys.Date()-7, Sys.Date(), by = 'day')
+          showModal(skip_Modal(failed = TRUE))
+        }
+        else {
+
+          if (which(morgen$Dato == input$dato_skip) > which(morgen$Dato == as.Date(akt_dato))) {
+            morgen2$Dato <<- morgen2$Dato - 1
+          }
+
+          morgen <<- subset(morgen, Dato != input$dato_skip)
+
+          if (min(skip_slet) != nrow(morgen) + 1 & min(skip_slet) != 1) {
+            morgen$Dato[(min(skip_slet)):nrow(morgen)] <<- morgen$Dato[(min(skip_slet)):nrow(morgen)] - 1
+          }
+
+          removeModal()
+        }
+      }
+      else {
+        showModal(skip_Modal(failed = TRUE))
+      }
+    }
+
+    # if (input$skip_slet == 'Tilføj') {
+    # 
+    #   if (input$dato_skip %in% morgen$Dato) {
+    #     showModal(skip_Modal(failed = TRUE))
+    #   }
+    #   else {
+    #     dato_input <- format(input$dato_skip, format = '%Y-%m-%d')
+    # 
+    #     morgen <<- rbind(morgen, c(Person = input$tilføj_pers, Dato = dato_input))
+    # 
+    #     morgen <<- arrange(morgen, Dato)
+    # 
+    #     startdato <- morgen$Dato[nrow(morgen)] + 1
+    #     morgen2$Dato <<- seq(startdato, startdato + (nrow(morgen2)-1), by = 'day')
+    # 
+    #     removeModal()
+    #   }
+    # }
+
+  })
+  
+  
   ### OUTPUT TABEL ----------------------------------
   output$morgen <- DT::renderDataTable({
     input$ok_skip
