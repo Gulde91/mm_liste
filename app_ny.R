@@ -282,7 +282,6 @@ server <- shinyServer(function(input, output, session) {
   })
   
   
-  
   ### BYT --------------------------------------------  
   # creating byt_modal  
   byt_Modal <- function(failed = FALSE) {
@@ -353,52 +352,52 @@ server <- shinyServer(function(input, output, session) {
   })
   
   # Observe byt event
-  # observeEvent(input$ok_byt, {
-  #   
-  #   if(input$byt1 == 'Manuel' & input$byt2 == 'Manuel') {
-  #     
-  #     if(input$manuel_dato_ud %in% morgen$Dato) {
-  #       
-  #       morgen$Person[morgen$Person == input$manuel_byt_ud & 
-  #                       morgen$Dato == input$manuel_dato_ud] <<- input$manuel_byt_ind
-  #       
-  #       morgen$Dato[morgen$Person == input$manuel_byt_ud &
-  #                     morgen$Dato == input$manuel_dato_ud] <<- input$manuel_dato_ind 
-  #       
-  #       removeModal()
-  #     }
-  #     else {
-  #       showModal(byt_Modal(failed = TRUE))
-  #     }
-  #   }
-  #   else if (input$byt1 == 'Manuel' | input$byt2 == 'Manuel'){
-  #     showModal(byt_Modal(failed = TRUE))
-  #   }
-  #   else {
-  #     
-  #     morgen_1og2_tmp <<- rbind(morgen, morgen2)
-  #     
-  #     byt1_index <<- which(morgen_1og2_tmp$Person %in% input$byt1 & 
-  #                            morgen_1og2_tmp$Dato %in% input$dato_byt1) 
-  #     
-  #     byt2_index <<- which(morgen_1og2_tmp$Person %in% input$byt2 & 
-  #                            morgen_1og2_tmp$Dato %in% input$dato_byt2) 
-  #     
-  #     if(length(byt1_index) == 1 & length(byt2_index) == 1) {
-  #       morgen_1og2_tmp$Person[byt1_index] <<- input$byt2
-  #       morgen_1og2_tmp$Person[byt2_index] <<- input$byt1
-  #       
-  #       morgen <<- morgen_1og2_tmp[1:nrow(morgen),]
-  #       morgen2 <<- morgen_1og2_tmp[(nrow(morgen)+1):nrow(morgen_1og2_tmp),]
-  #       
-  #       removeModal() 
-  #     }
-  #     else {
-  #       showModal(byt_Modal(failed = TRUE))
-  #     }      
-  #     
-  #   }
-  # })
+  observeEvent(input$ok_byt, {
+
+    if (input$byt1 == 'Manuel' & input$byt2 == 'Manuel') {
+
+      if (input$manuel_dato_ud %in% morgen$Dato) {
+
+        morgen$Person[morgen$Person == input$manuel_byt_ud &
+                      morgen$Dato == input$manuel_dato_ud] <<- input$manuel_byt_ind
+
+        morgen$Dato[morgen$Person == input$manuel_byt_ud &
+                      morgen$Dato == input$manuel_dato_ud] <<- input$manuel_dato_ind
+
+        removeModal()
+      }
+      else {
+        showModal(byt_Modal(failed = TRUE))
+      }
+    }
+    else if (input$byt1 == 'Manuel' | input$byt2 == 'Manuel'){
+      showModal(byt_Modal(failed = TRUE))
+    }
+    else {
+
+      morgen_1og2_tmp <<- rbind(morgen, morgen2)
+
+      byt1_index <<- which(morgen_1og2_tmp$Person %in% input$byt1 &
+                             morgen_1og2_tmp$Dato %in% input$dato_byt1)
+
+      byt2_index <<- which(morgen_1og2_tmp$Person %in% input$byt2 &
+                             morgen_1og2_tmp$Dato %in% input$dato_byt2)
+
+      if(length(byt1_index) == 1 & length(byt2_index) == 1) {
+        morgen_1og2_tmp$Person[byt1_index] <<- input$byt2
+        morgen_1og2_tmp$Person[byt2_index] <<- input$byt1
+
+        morgen <<- morgen_1og2_tmp[1:nrow(morgen),]
+        morgen2 <<- morgen_1og2_tmp[(nrow(morgen)+1):nrow(morgen_1og2_tmp),]
+
+        removeModal()
+      }
+      else {
+        showModal(byt_Modal(failed = TRUE))
+      }
+
+    }
+  })
   
   
   ### OUTPUT TABEL ----------------------------------
@@ -471,7 +470,7 @@ ui <- dashboardPage(skin = 'blue',
                     ),
                     dashboardSidebar(
                       sidebarMenu(
-                        menuItem('Morgenmadsliste', tabName = 'morgen', icon = icon('coffe')) # birthday-cake
+                        menuItem('Morgenmadsliste', tabName = 'morgen', icon = icon('coffe'))
                       )
                       
                     ),
