@@ -31,7 +31,7 @@ if (!exists('morgen')) {
   morgen$Dato <- seq(startdato, startdato + (nrow(morgen) - 1) * dato_interval, by = dato_interval)
 }
 
-if(!exists('morgen2')) {
+if (!exists('morgen2')) {
   morgen2 <- data.frame(Person = medlemmer)
   morgen2$Person <- as.character(morgen2$Person)
   startdato <- morgen$Dato[nrow(morgen)] + dato_interval
@@ -510,25 +510,26 @@ server <- shinyServer(function(input, output, session) {
 
       if (input$dato_skip %in% morgen$Dato) {
 
-        skip_slet <- which(morgen$Dato == input$dato_skip)
+         skip_slet_index <- which(morgen$Dato == input$dato_skip)
 
-        if (which(morgen$Dato == akt_dato) %in% skip_slet) { # %in% seq(Sys.Date()-7, Sys.Date(), by = 'day')
-          showModal(skip_Modal(failed = TRUE))
-        }
-        else {
-
-          if (which(morgen$Dato == input$dato_skip) > which(morgen$Dato == as.Date(akt_dato))) {
-            morgen2$Dato <<- morgen2$Dato - 1
-          }
-
+        if (skip_slet_index == 1) {
           morgen <<- subset(morgen, Dato != input$dato_skip)
-
-          if (min(skip_slet) != nrow(morgen) + 1 & min(skip_slet) != 1) {
-            morgen$Dato[(min(skip_slet)):nrow(morgen)] <<- morgen$Dato[(min(skip_slet)):nrow(morgen)] - 1
-          }
+        } 
+         else {
+           
+           morgen_start_dato <- morgen$Dato[1]
+           
+           morgen <<- subset(morgen, Dato != input$dato_skip)
+           morgen$Dato <<- seq(morgen_start_dato, 
+                               morgen_start_dato + (nrow(morgen)-1) * dato_interval,
+                               by = dato_interval)
+           
+           morgen2$Dato <<- seq(morgen$Dato[nrow(morgen)] + dato_interval, 
+                                morgen$Dato[nrow(morgen)] + nrow(morgen2) * dato_interval,
+                                by = dato_interval)
+        }  
 
           removeModal()
-        }
       }
       else {
         showModal(skip_Modal(failed = TRUE))
