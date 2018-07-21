@@ -282,6 +282,125 @@ server <- shinyServer(function(input, output, session) {
   })
   
   
+  
+  ### BYT --------------------------------------------  
+  # creating byt_modal  
+  byt_Modal <- function(failed = FALSE) {
+    modalDialog(easyClose = T,
+                fade = T,
+                title = 'BYT',
+                
+                fluidRow(
+                  column(4,
+                         selectInput(inputId = 'byt1',
+                                     label = 'Vælg person',
+                                     choices = c(medlemmer,
+                                                 'Manuel')
+                         )
+                  ),
+                  column(4,
+                         dateInput(inputId = 'dato_byt1', 
+                                   label = 'Vælg dato'
+                         )
+                  )
+                ),
+                
+                fluidRow(
+                  column(4,
+                         selectInput(inputId = 'byt2',
+                                     label = 'Byt med',
+                                     choices = c(medlemmer,
+                                                 'Manuel')
+                         )
+                  ),
+                  column(4, 
+                         dateInput(inputId = 'dato_byt2', 
+                                   label = 'Vælg dato'
+                         )
+                  )
+                ),
+                
+                conditionalPanel(
+                  condition = "input.byt1 == 'Manuel' & 
+                  input.byt2 == 'Manuel'",
+                  selectInput(inputId = "manuel_byt_ud", 
+                              label = 'Vælg person',
+                              choices = morgen$Person),
+                  dateInput(inputId = 'manuel_dato_ud', 
+                            label = 'Vælg dato'),
+                  selectInput(inputId = "manuel_byt_ind", 
+                              label = 'Vælg ny person',
+                              choices = medlemmer),
+                  dateInput(inputId = 'manuel_dato_ind', 
+                            label = 'Vælg ny dato')
+                ),
+                
+                if (failed) { # conditional panel
+                  div(tags$b("Dette bytte er ikke muligt", style = "color: blue;"))
+                },
+                
+                footer = tagList(
+                  modalButton("Cancel"),
+                  actionButton("ok_byt", "OK")
+                )
+                
+)
+  }
+  
+  # Show byt_Modal when button is clicked.
+  observeEvent(input$byt, {
+    showModal(byt_Modal())
+  })
+  
+  # Observe byt event
+  # observeEvent(input$ok_byt, {
+  #   
+  #   if(input$byt1 == 'Manuel' & input$byt2 == 'Manuel') {
+  #     
+  #     if(input$manuel_dato_ud %in% morgen$Dato) {
+  #       
+  #       morgen$Person[morgen$Person == input$manuel_byt_ud & 
+  #                       morgen$Dato == input$manuel_dato_ud] <<- input$manuel_byt_ind
+  #       
+  #       morgen$Dato[morgen$Person == input$manuel_byt_ud &
+  #                     morgen$Dato == input$manuel_dato_ud] <<- input$manuel_dato_ind 
+  #       
+  #       removeModal()
+  #     }
+  #     else {
+  #       showModal(byt_Modal(failed = TRUE))
+  #     }
+  #   }
+  #   else if (input$byt1 == 'Manuel' | input$byt2 == 'Manuel'){
+  #     showModal(byt_Modal(failed = TRUE))
+  #   }
+  #   else {
+  #     
+  #     morgen_1og2_tmp <<- rbind(morgen, morgen2)
+  #     
+  #     byt1_index <<- which(morgen_1og2_tmp$Person %in% input$byt1 & 
+  #                            morgen_1og2_tmp$Dato %in% input$dato_byt1) 
+  #     
+  #     byt2_index <<- which(morgen_1og2_tmp$Person %in% input$byt2 & 
+  #                            morgen_1og2_tmp$Dato %in% input$dato_byt2) 
+  #     
+  #     if(length(byt1_index) == 1 & length(byt2_index) == 1) {
+  #       morgen_1og2_tmp$Person[byt1_index] <<- input$byt2
+  #       morgen_1og2_tmp$Person[byt2_index] <<- input$byt1
+  #       
+  #       morgen <<- morgen_1og2_tmp[1:nrow(morgen),]
+  #       morgen2 <<- morgen_1og2_tmp[(nrow(morgen)+1):nrow(morgen_1og2_tmp),]
+  #       
+  #       removeModal() 
+  #     }
+  #     else {
+  #       showModal(byt_Modal(failed = TRUE))
+  #     }      
+  #     
+  #   }
+  # })
+  
+  
   ### OUTPUT TABEL ----------------------------------
   output$morgen <- DT::renderDataTable({
     input$ok_skip
