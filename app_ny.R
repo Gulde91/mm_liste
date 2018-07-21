@@ -536,24 +536,25 @@ server <- shinyServer(function(input, output, session) {
       }
     }
 
-    # if (input$skip_slet == 'Tilføj') {
-    # 
-    #   if (input$dato_skip %in% morgen$Dato) {
-    #     showModal(skip_Modal(failed = TRUE))
-    #   }
-    #   else {
-    #     dato_input <- format(input$dato_skip, format = '%Y-%m-%d')
-    # 
-    #     morgen <<- rbind(morgen, c(Person = input$tilføj_pers, Dato = dato_input))
-    # 
-    #     morgen <<- arrange(morgen, Dato)
-    # 
-    #     startdato <- morgen$Dato[nrow(morgen)] + 1
-    #     morgen2$Dato <<- seq(startdato, startdato + (nrow(morgen2)-1), by = 'day')
-    # 
-    #     removeModal()
-    #   }
-    # }
+    if (input$skip_slet == 'Tilføj') {
+
+      if (input$dato_skip %in% morgen$Dato) {
+        showModal(skip_Modal(failed = TRUE))
+      }
+      else {
+        dato_input <- format(input$dato_skip, format = '%Y-%m-%d')
+
+        morgen <<- rbind(morgen, c(Person = input$tilføj_pers, Dato = dato_input))
+
+        morgen <<- arrange(morgen, Dato)
+
+        morgen2$Dato <<- seq(morgen$Dato[nrow(morgen)] + dato_interval, 
+                             morgen$Dato[nrow(morgen)] + nrow(morgen2) * dato_interval,
+                             by = dato_interval)
+
+        removeModal()
+      }
+    }
 
   })
   
