@@ -16,8 +16,8 @@ if (!exists('medlemmer')) {
   medlemmer <- c('Alexander',
                  'Erik',
                  'Jenny',
-                 'Rasmus',
-                 'Kristian'
+                 'Kristian',
+                 'Rasmus'
   )
 }
 
@@ -231,54 +231,54 @@ server <- shinyServer(function(input, output, session) {
       }
     }
     
-    # if (input$til_afm_per == 'Tilmeld') {
-    #   if (!(tolower(trimws(input$Tilmeld_pers)) %in% tolower(trimws(morgen_orig$Person)))) {
-    #     
-    #     morgen_orig <<- rbind(morgen_orig, input$Tilmeld_pers) %>% arrange(Person)
-    #     medlemmer <<- c(medlemmer, input$Tilmeld_pers) %>% sort()
-    #     
-    #     tmp_m2_idx <- c(morgen2$Person, input$Tilmeld_pers) %>% sort()
-    #     tmp_m2_idx <- which(tmp_m2_idx %in% input$Tilmeld_pers)
-    #     
-    #     if (tmp_m2_idx == 1) {
-    #       morgen2 <<- rbind(data.frame(Person = input$Tilmeld_pers, Dato = morgen2$Dato[tmp_m2_idx]),
-    #                         morgen2)
-    #       morgen2$Dato[2:nrow(morgen2)] <<- morgen2$Dato[2:nrow(morgen2)] + 1
-    #     }
-    #     else if (tmp_m2_idx == nrow(morgen2) + 1) {
-    #       morgen2 <<- rbind(morgen2,
-    #                         data.frame(Person = input$Tilmeld_pers, Dato = morgen2$Dato[tmp_m2_idx-1] + 1))
-    #     } 
-    #     else {
-    #       morgen2 <<- rbind(morgen2[1:(tmp_m2_idx-1),],
-    #                         data.frame(Person = input$Tilmeld_pers, Dato = morgen2$Dato[tmp_m2_idx]),
-    #                         morgen2[tmp_m2_idx:nrow(morgen2),])
-    #       morgen2$Dato[(tmp_m2_idx+1):nrow(morgen2)] <<- morgen2$Dato[(tmp_m2_idx+1):nrow(morgen2)] + 1
-    #     }
-    #     
-    #     if(input$tilmeld_nu == T) {
-    #       if(!(input$Tilmeld_pers %in% morgen$Person)) {
-    #         #which(morgen$Dato %in% seq(dags_dato-7, as.Date(akt_dato), by = 'day'))
-    #         
-    #         dato_input <- format(morgen$Dato[nrow(morgen)] + 1, format = '%Y-%m-%d') # + 6
-    #         
-    #         morgen <<- rbind(morgen, c(Person = input$Tilmeld_pers, Dato = dato_input)) 
-    #         morgen2$Dato <<- morgen2$Dato + 1
-    #         
-    #         removeModal()
-    #         
-    #       } else {
-    #         showModal(til_afm_model(failed = TRUE))
-    #       }
-    #     }
-    #     if(input$tilmeld_nu == F) {
-    #       removeModal()
-    #     }  
-    #   }
-    #   else {
-    #     showModal(til_afm_model(failed = TRUE))
-    #   }
-    # }
+    if (input$til_afm_per == 'Tilmeld') {
+      if (!(tolower(trimws(input$Tilmeld_pers)) %in% tolower(trimws(morgen_orig$Person)))) {
+
+        morgen_orig <<- rbind(morgen_orig, input$Tilmeld_pers) %>% arrange(Person)
+        medlemmer <<- c(medlemmer, input$Tilmeld_pers) %>% sort()
+
+        tmp_m2_idx <- c(morgen2$Person, input$Tilmeld_pers) %>% sort()
+        tmp_m2_idx <- which(tmp_m2_idx %in% input$Tilmeld_pers)
+
+        if (tmp_m2_idx == 1) {
+          morgen2 <<- rbind(data.frame(Person = input$Tilmeld_pers, Dato = morgen2$Dato[tmp_m2_idx]),
+                            morgen2)
+          morgen2$Dato[2:nrow(morgen2)] <<- morgen2$Dato[2:nrow(morgen2)] + dato_interval
+        }
+        else if (tmp_m2_idx == nrow(morgen2) + 1) {
+          morgen2 <<- rbind(morgen2,
+                            data.frame(Person = input$Tilmeld_pers, Dato = morgen2$Dato[tmp_m2_idx-1] + dato_interval))
+        }
+        else {
+          morgen2 <<- rbind(morgen2[1:(tmp_m2_idx-1),],
+                            data.frame(Person = input$Tilmeld_pers, Dato = morgen2$Dato[tmp_m2_idx]),
+                            morgen2[tmp_m2_idx:nrow(morgen2),])
+          morgen2$Dato[(tmp_m2_idx+1):nrow(morgen2)] <<- morgen2$Dato[(tmp_m2_idx+1):nrow(morgen2)] + dato_interval
+        }
+
+        if (input$tilmeld_nu == T) {
+          if (!(input$Tilmeld_pers %in% morgen$Person)) {
+            #which(morgen$Dato %in% seq(dags_dato-7, as.Date(akt_dato), by = 'day'))
+
+            dato_input <- format(morgen$Dato[nrow(morgen)] + dato_interval, format = '%Y-%m-%d')
+
+            morgen <<- rbind(morgen, c(Person = input$Tilmeld_pers, Dato = dato_input))
+            morgen2$Dato <<- morgen2$Dato + dato_interval
+
+            removeModal()
+
+          } else {
+            showModal(til_afm_model(failed = TRUE))
+          }
+        }
+        if (input$tilmeld_nu == F) {
+          removeModal()
+        }
+      }
+      else {
+        showModal(til_afm_model(failed = TRUE))
+      }
+    }
   })
   
   
