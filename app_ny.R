@@ -27,7 +27,7 @@ morgen_orig$Person <- as.character(morgen_orig$Person)
 if (!exists('morgen')) {
   morgen <- data.frame(Person = medlemmer)
   morgen$Person <- as.character(morgen$Person)
-  startdato <- as.Date("2018-07-06")
+  startdato <- as.Date("2018-07-20")
   morgen$Dato <- seq(startdato, startdato + (nrow(morgen) - 1) * dato_interval, by = dato_interval)
 }
 
@@ -116,88 +116,89 @@ server <- shinyServer(function(input, output, session) {
         showModal(til_afm_model(failed = TRUE))
       }
       
-      # else if (input$afmeld_midl == F) {
-      #   
-      #   morgen_orig <<- subset(morgen_orig, Person != input$afmeld_pers)
-      #   
-      #   idx_afmeld <<- which(medlemmer %in% input$afmeld_pers)
-      #   medlemmer <<- medlemmer[-idx_afmeld]
-      #   
-      #   afm_pers_m2_index <<- which(morgen2$Person == input$afmeld_pers)
-      #   morgen2 <<- subset(morgen2, Person != input$afmeld_pers)
-      #   morgen2$Dato <<- seq(morgen$Dato[nrow(morgen)] + 1, 
-      #                        morgen$Dato[nrow(morgen)] + nrow(morgen2), 
-      #                        by = 1) # + 7 
-      #   
-      #   if(input$afmeld_nu == T) {
-      #     if (input$afmeld_pers %in% morgen$Person) {
-      #       afm_akt_index <<- which(morgen$Dato == as.Date(akt_dato)) # sys.Date() kode til rettes til uge-basis
-      #       
-      #       if (sum(morgen$Person == input$afmeld_pers) == 1) {
-      #         if (morgen$Person[afm_akt_index] == input$afmeld_pers) {
-      #           showModal(til_afm_model(failed = TRUE))
-      #         }
-      #         else if (which(morgen$Person == input$afmeld_pers) < afm_akt_index) {
-      #           showModal(til_afm_model(failed = TRUE))
-      #         }
-      #         
-      #         else {
-      #           afm_pers_index <- which(morgen$Person == input$afmeld_pers)
-      #           
-      #           morgen <<- subset(morgen, Person != input$afmeld_pers)
-      #           
-      #           if (afm_pers_index != nrow(morgen)+1) {
-      #             morgen$Dato[(afm_pers_index):nrow(morgen)] <<- morgen$Dato[(afm_pers_index):nrow(morgen)] - 1  
-      #           }
-      #           
-      #           morgen2$Dato <<- morgen2$Dato - 1
-      #           
-      #           removeModal()
-      #         }
-      #       }
-      #       else if (sum(morgen$Person == input$afmeld_pers) == 2) {
-      #         afm_pers_index <<- which(morgen$Person == input$afmeld_pers)  
-      #         
-      #         if (morgen$Person[afm_akt_index] == input$afmeld_pers) {
-      #           showModal(til_afm_model(failed = TRUE))
-      #         }
-      #         else if (afm_pers_index[1] < afm_akt_index & afm_pers_index[2] < afm_akt_index) {
-      #           showModal(til_afm_model(failed = TRUE))
-      #         } 
-      #         else if (afm_pers_index[1] < afm_akt_index & afm_pers_index[2] > afm_akt_index) {
-      #           
-      #           afm_pers_index_2  <- which(morgen$Person == input$afmeld_pers)[2]
-      #           morgen <<- morgen[-afm_pers_index_2,]
-      #           
-      #           if (afm_pers_index_2 != nrow(morgen)+1) {
-      #             morgen$Dato[(afm_pers_index_2):nrow(morgen)] <<- morgen$Dato[(afm_pers_index_2):nrow(morgen)] - 1  
-      #           }
-      #           
-      #           morgen2$Dato <<- morgen2$Dato - 1
-      #           removeModal()
-      #         }
-      #         else if (afm_pers_index[1] > afm_akt_index & afm_pers_index[2] > afm_akt_index) {
-      #           
-      #           morgen <<- morgen[-afm_pers_index,]
-      #           morgen$Dato <<- seq(morgen$Dato[1], morgen$Dato[1] + nrow(morgen) - 1, by = 'day')
-      #           
-      #           morgen2$Dato <<- morgen2$Dato - 2
-      #           removeModal()
-      #         }
-      #       }
-      #       else {
-      #         showModal(til_afm_model(failed = TRUE))
-      #       }
-      #       
-      #     } 
-      #     else {
-      #       showModal(til_afm_model(failed = TRUE))
-      #     }
-      #     
-      #   } else {
-      #     removeModal()
-      #   }  
-      # } 
+      else if (input$afmeld_midl == F) {
+
+        morgen_orig <<- subset(morgen_orig, Person != input$afmeld_pers)
+
+        idx_afmeld <<- which(medlemmer %in% input$afmeld_pers)
+        medlemmer <<- medlemmer[-idx_afmeld]
+
+        #afm_pers_m2_index <<- which(morgen2$Person == input$afmeld_pers) # kan denne linje slettes?
+        morgen2 <<- subset(morgen2, Person != input$afmeld_pers)
+        morgen2$Dato <<- seq(morgen$Dato[nrow(morgen)] + dato_interval, 
+                             morgen$Dato[nrow(morgen)] + nrow(morgen2) * dato_interval,
+                             by = dato_interval)
+
+        if(input$afmeld_nu == T) {
+          if (input$afmeld_pers %in% morgen$Person) {
+            #afm_akt_index <<- which(morgen$Dato == as.Date(akt_dato)) # sys.Date() kode til rettes til uge-basis
+            afm_akt_index <<- which(morgen$Dato %in% seq(akt_dato, akt_dato + dato_interval - 1,  by = 1))
+
+            if (sum(morgen$Person == input$afmeld_pers) == 1) {
+              if (morgen$Person[afm_akt_index] == input$afmeld_pers) {
+                showModal(til_afm_model(failed = TRUE))
+              }
+              else if (which(morgen$Person == input$afmeld_pers) < afm_akt_index) {
+                showModal(til_afm_model(failed = TRUE))
+              }
+
+              else {
+                afm_pers_index <- which(morgen$Person == input$afmeld_pers)
+
+                morgen <<- subset(morgen, Person != input$afmeld_pers)
+
+                if (afm_pers_index != nrow(morgen) + 1) {
+                  morgen$Dato[(afm_pers_index):nrow(morgen)] <<- morgen$Dato[(afm_pers_index):nrow(morgen)] - dato_interval
+                }
+
+                morgen2$Dato <<- morgen2$Dato - dato_interval
+
+                removeModal()
+              }
+            }
+            else if (sum(morgen$Person == input$afmeld_pers) == 2) {
+              afm_pers_index <<- which(morgen$Person == input$afmeld_pers)
+
+              if (morgen$Person[afm_akt_index] == input$afmeld_pers) {
+                showModal(til_afm_model(failed = TRUE))
+              }
+              else if (afm_pers_index[1] < afm_akt_index & afm_pers_index[2] < afm_akt_index) {
+                showModal(til_afm_model(failed = TRUE))
+              }
+              else if (afm_pers_index[1] < afm_akt_index & afm_pers_index[2] > afm_akt_index) {
+
+                afm_pers_index_2  <- which(morgen$Person == input$afmeld_pers)[2]
+                morgen <<- morgen[-afm_pers_index_2,]
+
+                if (afm_pers_index_2 != nrow(morgen) + 1) {
+                  morgen$Dato[(afm_pers_index_2):nrow(morgen)] <<- morgen$Dato[(afm_pers_index_2):nrow(morgen)] - dato_interval
+                }
+
+                morgen2$Dato <<- morgen2$Dato - dato_interval
+                removeModal()
+              }
+              else if (afm_pers_index[1] > afm_akt_index & afm_pers_index[2] > afm_akt_index) {
+
+                morgen <<- morgen[-afm_pers_index,]
+                morgen$Dato <<- seq(morgen$Dato[1], morgen$Dato[1] + nrow(morgen) - dato_interval, by = 1)
+
+                morgen2$Dato <<- morgen2$Dato - 2 * dato_interval
+                removeModal()
+              }
+            }
+            else {
+              showModal(til_afm_model(failed = TRUE))
+            }
+
+          }
+          else {
+            showModal(til_afm_model(failed = TRUE))
+          }
+
+        } else {
+          removeModal()
+        }
+       } 
       # else if (input$afmeld_midl == T) {
       #   if (input$afmeld_pers %in% morgen$Person) {
       #     afmeld_midl_index <- which(morgen$Dato == as.Date(akt_dato)) # sys.Date() kode til rettes til uge-basis
