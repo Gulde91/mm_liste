@@ -112,9 +112,9 @@ server <- shinyServer(function(input, output, session) {
     
     if (input$til_afm_per == 'Afmeld') {
       
-      if(input$afmeld_nu == T & input$afmeld_midl == T) {
-        showModal(til_afm_model(failed = TRUE))
-      }
+      if (input$afmeld_nu == T & input$afmeld_midl == T) {
+           showModal(til_afm_model(failed = TRUE))
+        }
       
       else if (input$afmeld_midl == F) {
 
@@ -199,36 +199,36 @@ server <- shinyServer(function(input, output, session) {
           removeModal()
         }
        } 
-      # else if (input$afmeld_midl == T) {
-      #   if (input$afmeld_pers %in% morgen$Person) {
-      #     afmeld_midl_index <- which(morgen$Dato == as.Date(akt_dato)) # sys.Date() kode til rettes til uge-basis
-      #     
-      #     if (morgen$Person[afmeld_midl_index] == input$afmeld_pers) {
-      #       showModal(til_afm_model(failed = TRUE))
-      #     }
-      #     else if (which(morgen$Person == input$afmeld_pers) < afmeld_midl_index) {
-      #       showModal(til_afm_model(failed = TRUE))
-      #     }
-      #     else {
-      #       afmeld_person_midl_index <- which(morgen$Person == input$afmeld_pers)
-      #       
-      #       morgen <<- subset(morgen, Person != input$afmeld_pers)
-      #       
-      #       if (afmeld_person_midl_index != nrow(morgen)+1) {
-      #         morgen$Dato[(afmeld_person_midl_index):nrow(morgen)] <<- morgen$Dato[(afmeld_person_midl_index):nrow(morgen)] - 1  
-      #       }
-      #       
-      #       morgen2$Dato <<- morgen2$Dato - 1
-      #       
-      #       removeModal()
-      #     }
-      #   }
-      #   else {
-      #     showModal(til_afm_model(failed = TRUE))
-      #   }
-      #   
-      #   
-      # }
+      else if (input$afmeld_midl == T) {
+        if (input$afmeld_pers %in% morgen$Person) {
+          afmeld_midl_index <<- which(morgen$Dato %in% seq(akt_dato, akt_dato + dato_interval - 1,  by = 1))
+
+          if (morgen$Person[afmeld_midl_index] == input$afmeld_pers) {
+            showModal(til_afm_model(failed = TRUE))
+          }
+          else if (which(morgen$Person == input$afmeld_pers) < afmeld_midl_index) {
+            showModal(til_afm_model(failed = TRUE))
+          }
+          else {
+            afmeld_person_midl_index <- which(morgen$Person == input$afmeld_pers)
+
+            morgen <<- subset(morgen, Person != input$afmeld_pers)
+
+            if (afmeld_person_midl_index != nrow(morgen)+1) {
+              morgen$Dato[(afmeld_person_midl_index):nrow(morgen)] <<- morgen$Dato[(afmeld_person_midl_index):nrow(morgen)] - dato_interval
+            }
+
+            morgen2$Dato <<- morgen2$Dato - dato_interval
+
+            removeModal()
+          }
+        }
+        else {
+          showModal(til_afm_model(failed = TRUE))
+        }
+
+
+      }
     }
     
     # if (input$til_afm_per == 'Tilmeld') {
